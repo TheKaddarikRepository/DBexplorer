@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.ConneDbController">
+  <children>
+    <MenuBar VBox.vgrow="NEVER">
+      <menus>
+        <Menu mnemonicParsing="false" text="Help">
+          <items>
+            <MenuItem mnemonicParsing="false" text="About MyHelloApp" />
+          </items>
+        </Menu>
+      </menus>
+    </MenuBar>
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+      <children>
+            <ComboBox fx:id="databaseCombo" layoutX="138.0" layoutY="14.0" prefWidth="150.0" />
+            <TextField fx:id="addressText" layoutX="523.0" layoutY="14.0" />
+            <TextField fx:id="portText" layoutX="837.0" layoutY="14.0" />
+            <Button fx:id="connectButton" layoutX="1155.0" layoutY="14.0" mnemonicParsing="false" onAction="#connectDB" text="Connexion" />
+            <ListView fx:id="dataBaseList" layoutX="14.0" layoutY="77.0" onMouseClicked="#showTables" prefHeight="551.0" prefWidth="220.0" />
+            <ListView fx:id="tablesList" layoutX="259.0" layoutY="77.0" onMouseClicked="#showContent" prefHeight="551.0" prefWidth="220.0" />
+            <TableView fx:id="contentTable" layoutX="523.0" layoutY="77.0" prefHeight="551.0" prefWidth="729.0">
+              <columns>
+                <TableColumn prefWidth="75.0" text="C1" />
+                <TableColumn prefWidth="75.0" text="C2" />
+              </columns>
+            </TableView>
+            <TextArea fx:id="queryText" layoutX="14.0" layoutY="656.0" prefHeight="105.0" prefWidth="948.0" />
+            <Button fx:id="executeButton" layoutX="1021.0" layoutY="696.0" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#executeQuery" prefWidth="100.0" text="Exécuter" />
+            <Button fx:id="saveButton" layoutX="1142.0" layoutY="671.0" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#saveFile" prefWidth="100.0" text="Sauver" />
+            <Button fx:id="loadButton" layoutX="1142.0" layoutY="721.0" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#loadFile" prefWidth="100.0" text="Charger" />
+            <Label layoutX="45.0" layoutY="18.0" text="Serveur DB" />
+            <Label layoutX="439.0" layoutY="18.0" text="IP Serveur :" />
+            <Label layoutX="762.0" layoutY="18.0" text="Port :" />
+            <Label layoutX="259.0" layoutY="53.0" text="Tables" />
+            <Label layoutX="14.0" layoutY="53.0" text="Basses de données" />
+            <Label layoutX="523.0" layoutY="53.0" text="Contenu" />
+            <Label layoutX="14.0" layoutY="639.0" text="Requète :" />
+      </children>
+    </AnchorPane>
+  </children>
+</VBox>
