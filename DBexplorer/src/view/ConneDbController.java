@@ -99,19 +99,19 @@ public class ConneDbController {
 	@FXML
 	void executeQuery(ActionEvent event) {
 		if (queryText.getText() != "") {
-			myView.adhocQuery(dataBaseList.getSelectionModel().getSelectedItem(), queryText.getText());
+			myView.adhocQuery(queryText.getText());
 		}
 	}
 
 	@FXML
 	void saveFile(ActionEvent event) {
-		myView.toFile(queryText.getText());
+		myView.saveFile(queryText.getText());
 		queryText.setText("");
 	}
 
 	@FXML
 	void loadFile(ActionEvent event) {
-		queryText.setText(myView.fromFile());
+		queryText.setText(myView.readFile());
 	}
 
 	public ComboBox<databaseDrivers> getDataBaseCombo() {

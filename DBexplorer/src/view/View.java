@@ -10,6 +10,7 @@ import java.util.List;
 
 import application.MyException;
 import data.DataResults;
+import data.FileAction;
 import data.connectionDB;
 import data.connectionMySQL;
 import data.databaseDrivers;
@@ -29,6 +30,12 @@ public class View {
 	private connectionDB dataBase;
 	private Stage primaryStage;
 
+	/**
+	 * It sets the graphical interface and its controller at the start of the
+	 * application. And defines its behavior in the event of the close operation.
+	 * 
+	 * @param _primaryStage
+	 */
 	public View(Stage _primaryStage) {
 		this.primaryStage = _primaryStage;
 		try {
@@ -39,6 +46,7 @@ public class View {
 			primaryStage.setScene(new Scene(root));
 			initialize();
 
+			// To request a confirmation before closing.
 			primaryStage.setOnCloseRequest(event -> {
 				ConfirmCloseOperation myConfirmation = new ConfirmCloseOperation();
 				myConfirmation.getResult().ifPresent(yesNo -> {
@@ -50,6 +58,8 @@ public class View {
 							showError(new MyException(e.getMessage(), AlertType.WARNING));
 						}
 						primaryStage.close();
+					} else {
+						event.consume();
 					}
 					;
 				});
@@ -57,10 +67,14 @@ public class View {
 
 			primaryStage.show();
 		} catch (Exception e) {
-			e.printStackTrace();
+			showError(new MyException(e.getMessage(), AlertType.ERROR));
 		}
 	}
 
+	/**
+	 * This initialize the values for the connection. (particularly for my
+	 * configuration, since I was lazy retyping those.)
+	 */
 	public void initialize() {
 		control.setMyView(this);
 		for (databaseDrivers db : databaseDrivers.values()) {
@@ -71,18 +85,31 @@ public class View {
 		control.getPortText().setText("3306");
 	}
 
+	/**
+	 * It initiate the connection to the database Engine and get the list of
+	 * databases in it.
+	 * 
+	 * @param address
+	 * @param port
+	 * @throws MyException
+	 */
 	public void firstConnection(String address, String port) throws MyException {
 		switch (control.getDataBaseCombo().getValue()) {
 		case MySQL:
 			LoginMessage myLogin = new LoginMessage();
-			// myLogin.getResult().ifPresent(new UseLoginInfo());
 			myLogin.getResult().ifPresent(usernamePassword -> {
-				dataBase = new connectionMySQL(address, port, usernamePassword.getKey(), usernamePassword.getValue(),
-						this);
+				try {
+					dataBase = new connectionMySQL(address, port, usernamePassword.getKey(),
+							usernamePassword.getValue());
+					dataBase.extractDataBases();
+				} catch (MyException e) {
+					showError(e);
+				} catch (SQLException e) {
+					showError(new MyException(e.getMessage(), AlertType.WARNING));
+				}
 			});
-			// dataBase = new connectionMySQL(address, port, login, password, this);
-			dataBase.extractDataBases();
-			control.getDataBaseList().setItems(dataBase.getDataBases());
+			if (dataBase.getDataBases() != null)
+				control.getDataBaseList().setItems(dataBase.getDataBases());
 			break;
 		case PostgreSQL:
 			throw new MyException("This functionnality is not implemented yet!", AlertType.INFORMATION);
@@ -94,16 +121,43 @@ public class View {
 		}
 	}
 
+	/**
+	 * Fills the table List with all the tables of the selected database.
+	 * 
+	 * @param dbName
+	 */
 	public void tablesFill(String dbName) {
-		dataBase.extractTables(dbName);
-		control.getTablesList().setItems(dataBase.getTables());
+		try {
+			dataBase.extractTables(dbName);
+			control.getTablesList().setItems(dataBase.getTables());
+		} catch (SQLException e) {
+			showError(new MyException(e.getMessage(), AlertType.WARNING));
+		}
+
 	}
 
+	/**
+	 * This get every entry of a table to display it in the the TableView of the
+	 * scene.
+	 * 
+	 * @param dbName
+	 * @param tableName
+	 */
 	public void contentFill(String dbName, String tableName) {
-		dataBase.extractContent(dbName + "." + tableName);
-		intoTable();
+		try {
+			dataBase.extractContent(dbName + "." + tableName);
+			intoTable();
+		} catch (SQLException e) {
+			showError(new MyException(e.getMessage(), AlertType.WARNING));
+		}
+
 	}
 
+	/**
+	 * Suppress every columns, then sets the columns according to the DataResult
+	 * object. Finally it sets the data in the TableView.
+	 * 
+	 */
 	private void intoTable() {
 		control.getContentTable().getColumns().removeAll(control.getContentTable().getColumns());
 		DataResults data = dataBase.getContent();
@@ -117,17 +171,48 @@ public class View {
 		control.getContentTable().getItems().setAll(data.getData());
 	}
 
-	public void adhocQuery(String database, String query) {
+	/**
+	 * it dispatches the adhoc query typed by the user depending on its use. (mostly
+	 * because of the return values).
+	 * 
+	 * @param database
+	 * @param query
+	 */
+	public void adhocQuery(String query) {
 		String upperQuery = query.toUpperCase();
 		if (upperQuery.contains("SELECT")) {
-			dataBase.executeSelect(database, query);
-			intoTable();
-		} else if (upperQuery.contains("INSERT") || upperQuery.contains("UPDATE") || upperQuery.contains("DELETE")) {
-			dataBase.executeUpdate(database, query);
-			intoTable();
+			try {
+				dataBase.executeSelect(query);
+				intoTable();
+			} catch (SQLException e) {
+				showError(new MyException(e.getMessage(), AlertType.WARNING));
+			}
+		} else if (upperQuery.contains("INSERT") || upperQuery.contains("UPDATE") || upperQuery.contains("DELETE")
+				|| upperQuery.contains("REPLACE")) {
+			try {
+				dataBase.executeUpdate(query);
+				intoTable();
+			} catch (SQLException e) {
+				showError(new MyException(e.getMessage(), AlertType.WARNING));
+			}
+
+		} else if (upperQuery.contains("CREATE") || upperQuery.contains("ALTER") || upperQuery.contains("DROP")
+				|| upperQuery.contains("RENAME") || upperQuery.contains("TRUNCATE")) {
+			try {
+				dataBase.executeAlter(query);
+				intoTable();
+			} catch (SQLException e) {
+				showError(new MyException(e.getMessage(), AlertType.WARNING));
+			}
+
 		}
 	}
 
+	/**
+	 * This enable to show every exceptions catched during the application run.
+	 * 
+	 * @param ex
+	 */
 	public void showError(MyException ex) {
 		Alert alert = new Alert(ex.getAlert());
 		alert.setTitle("Error Dialog");
@@ -135,42 +220,56 @@ public class View {
 		alert.showAndWait();
 	}
 
-	public void toFile(String query) {
+	/**
+	 * Open a file selection dialog to chose where to save the file.
+	 * 
+	 * @param query
+	 */
+	private File toFile(FileAction action) {
 		FileChooser fileChooser = new FileChooser();
+		File file = null;
 
-		// Set extension filter
 		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("SQL files (*.amsql)", "*.amsql");
 		fileChooser.getExtensionFilters().add(extFilter);
+		switch (action) {
+		case SAVE:
+			file = fileChooser.showSaveDialog(primaryStage);
+			break;
+		case READ:
+			file = fileChooser.showOpenDialog(primaryStage);
+			break;
+		}
+		return file;
+	}
 
-		// Show save file dialog
-		File file = fileChooser.showSaveDialog(primaryStage);
+	/**
+	 * save the user adhoc query to an "*.amsql" file.
+	 * 
+	 * @param content
+	 */
+	public void saveFile(String content) {
+		// Show file dialog
+		File file = toFile(FileAction.SAVE);
 
 		if (file != null) {
-			SaveFile(query, file);
+			try {
+				FileWriter fileWriter = new FileWriter(file);
+				fileWriter.write(content);
+				fileWriter.close();
+			} catch (IOException ex) {
+				showError(new MyException(ex.getMessage(), AlertType.ERROR));
+			}
 		}
 	}
 
-	private void SaveFile(String content, File file) {
-		try {
-			FileWriter fileWriter = null;
-			fileWriter = new FileWriter(file);
-			fileWriter.write(content);
-			fileWriter.close();
-		} catch (IOException ex) {
-			showError(new MyException(ex.getMessage(), AlertType.ERROR));
-		}
-
-	}
-
-	public String fromFile() {
-		FileChooser fileChooser = new FileChooser();
-
-		// Set extension filter
-		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("SQL files (*.amsql)", "*.amsql");
-		fileChooser.getExtensionFilters().add(extFilter);
-
-		// Show save file dialog
-		File file = fileChooser.showOpenDialog(primaryStage);
+	/**
+	 * Read an adhoc query from an "*.amsql" file.
+	 * 
+	 * @return String
+	 */
+	public String readFile() {
+		// Show file dialog
+		File file = toFile(FileAction.READ);
 
 		if (file != null) {
 			try {
@@ -190,15 +289,5 @@ public class View {
 		}
 		return new String("");
 	}
-
-	// class UseLoginInfo implements Consumer<Pair<String, String>> {
-	//
-	// @Override
-	// public void accept(Pair<String, String> usernamePassword) {
-	// dataBase = new connectionMySQL(control.getAddressText().getText(),
-	// control.getPortText().getText(), usernamePassword.getKey(),
-	// usernamePassword.getValue(), this);
-	// }
-	// }
 
 }
