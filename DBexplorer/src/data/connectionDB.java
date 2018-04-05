@@ -7,15 +7,16 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import application.MyException;
+import applicationDB.MyException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert.AlertType;
 
 /**
- * Singleton class to manage connection and query to the databases.
- * It must be extended for each database type.
- * For each database type the driver and base url is passed through an interface.
+ * Singleton class to manage connection and query to the databases. It must be
+ * extended for each database type. For each database type the driver and base
+ * url is passed through an interface.
+ * 
  * @author Cedric Ferrand
  *
  */
@@ -23,8 +24,8 @@ public abstract class connectionDB {
 	private static java.sql.Connection connection;
 	private static String driver;
 	private static String db;
-	private ObservableList<String> dataBases = FXCollections.observableArrayList();
-	private ObservableList<String> tables = FXCollections.observableArrayList();
+	private ObservableList<String> dataBases;
+	private ObservableList<String> tables;
 	protected DataResults content;
 
 	/**
@@ -36,6 +37,7 @@ public abstract class connectionDB {
 	 * @param password
 	 * @throws MyException
 	 */
+	@SuppressWarnings("deprecation")
 	public static void connect(String address, String port, String login, String password) throws MyException {
 		String url = db + address + ":" + port + "/" + "?verifyServerCertificate=false" + "&useSSL=false"
 				+ "&requireSSL=false";
@@ -43,7 +45,6 @@ public abstract class connectionDB {
 			try {
 				Class.forName(driver).newInstance();
 				connection = DriverManager.getConnection(url, login, password);
-				System.out.println("Connected");
 			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 				throw new MyException(e.getMessage(), AlertType.ERROR);
 			} catch (SQLException e) {
@@ -53,6 +54,11 @@ public abstract class connectionDB {
 
 	}
 
+	/**
+	 * Methode to get the static connection to the database.
+	 * 
+	 * @return
+	 */
 	public static java.sql.Connection getConnection() {
 		return connection;
 	}
@@ -72,14 +78,29 @@ public abstract class connectionDB {
 		stmt.close();
 	}
 
+	/**
+	 * to use the driver path from the interface.
+	 * 
+	 * @param _driver
+	 */
 	public static void setDriver(String _driver) {
 		connectionDB.driver = _driver;
 	}
 
+	/**
+	 * to use the database url root from the interface.
+	 * 
+	 * @param _db
+	 */
 	public static void setDb(String _db) {
 		connectionDB.db = _db;
 	}
 
+	/**
+	 * to close the connection before exiting the application or changing Engine.
+	 * 
+	 * @throws SQLException
+	 */
 	public void stop() throws SQLException {
 		if (connection != null)
 			connection.close();
@@ -87,7 +108,8 @@ public abstract class connectionDB {
 
 	/**
 	 * SQL request to get every databases in the DBMS.
-	 * @throws SQLException 
+	 * 
+	 * @throws SQLException
 	 */
 	public void extractDataBases() throws SQLException {
 		Statement stmt;
@@ -101,7 +123,8 @@ public abstract class connectionDB {
 
 	/**
 	 * SQL request to get every tables of a database in the DBMS.
-	 * @throws SQLException 
+	 * 
+	 * @throws SQLException
 	 */
 	public void extractTables(String dataBase) throws SQLException {
 		Statement stmt;
@@ -115,7 +138,8 @@ public abstract class connectionDB {
 
 	/**
 	 * SQL request to get every tuples in a table of a database in the DBMS.
-	 * @throws SQLException 
+	 * 
+	 * @throws SQLException
 	 */
 	public void extractContent(String databaseTable) throws SQLException {
 		Statement stmt;
@@ -132,7 +156,7 @@ public abstract class connectionDB {
 	 * to execute an ahdoc selection query typed by the user.
 	 * 
 	 * @param query
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public void executeSelect(String query) throws SQLException {
 		Statement stmt;
@@ -148,7 +172,7 @@ public abstract class connectionDB {
 	 * to execute an adhoc data modification query typed by the user.
 	 * 
 	 * @param query
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public void executeUpdate(String query) throws SQLException {
 		Statement stmt;
@@ -160,28 +184,59 @@ public abstract class connectionDB {
 		stmt.close();
 	}
 
+	/**
+	 * the list of database names.
+	 * 
+	 * @return
+	 */
 	public ObservableList<String> getDataBases() {
 		return dataBases;
 	}
 
+	/**
+	 * conversion of the resultset containing the list of databases names to an
+	 * observableList.
+	 * 
+	 * @param dataBasesRs
+	 * @throws SQLException
+	 */
 	protected void setDataBases(ResultSet dataBasesRs) throws SQLException {
+		dataBases = FXCollections.observableArrayList();
 		this.dataBases.removeAll(dataBases.sorted());
 		while (dataBasesRs.next()) {
 			this.dataBases.add(dataBasesRs.getString(1));
 		}
 	}
 
+	/**
+	 * list of tables names.
+	 * 
+	 * @return
+	 */
 	public ObservableList<String> getTables() {
 		return tables;
 	}
 
+	/**
+	 * conversion of the resultset containing the list of tables names to an
+	 * observableList.
+	 * 
+	 * @param tablesRs
+	 * @throws SQLException
+	 */
 	protected void setTables(ResultSet tablesRs) throws SQLException {
+		tables = FXCollections.observableArrayList();
 		this.tables.removeAll(tables.sorted());
 		while (tablesRs.next()) {
 			this.tables.add(tablesRs.getString(1));
 		}
 	}
 
+	/**
+	 * data from an SQL query.
+	 * 
+	 * @return
+	 */
 	public DataResults getContent() {
 		return content;
 	}
@@ -191,7 +246,7 @@ public abstract class connectionDB {
 	 * objects to List<object>)
 	 * 
 	 * @param contentRs
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	protected void setContent(ResultSet contentRs) throws SQLException {
 		List<List<Object>> data = new ArrayList<>();
@@ -214,8 +269,10 @@ public abstract class connectionDB {
 
 	/**
 	 * Create a DataResult to show the number of elements updated by the query.
+	 * 
 	 * @param contentRs
 	 */
+	@SuppressWarnings("deprecation")
 	private void setUpdateContent(int contentRs) {
 		List<List<Object>> data = new ArrayList<>();
 		List<String> columnNames = new ArrayList<>();

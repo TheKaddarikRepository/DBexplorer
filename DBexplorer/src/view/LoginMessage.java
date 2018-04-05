@@ -17,6 +17,12 @@ import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import javafx.util.Pair;
 
+/**
+ * the dialog box to ask for login & password information into the database.
+ * 
+ * @author cedric ferrand
+ *
+ */
 public class LoginMessage {
 
 	private Optional<Pair<String, String>> result;
@@ -59,6 +65,12 @@ public class LoginMessage {
 		result = dialog.showAndWait();
 	}
 
+	/**
+	 * the user must enter a login value at least.
+	 * 
+	 * @author cedric
+	 *
+	 */
 	class LoginChange implements ChangeListener<String> {
 
 		@Override
@@ -67,6 +79,12 @@ public class LoginMessage {
 		}
 	}
 
+	/**
+	 * put the priamryStage on wait untill the dialog is closed.
+	 * 
+	 * @author cedric
+	 *
+	 */
 	class TakeFocus implements Runnable {
 
 		@Override
@@ -76,6 +94,13 @@ public class LoginMessage {
 		}
 	}
 
+	/**
+	 * the part of the class that makes the connection with the View object to get
+	 * informations back.
+	 * 
+	 * @author cedric
+	 *
+	 */
 	class OnAction implements Callback<ButtonType, Pair<String, String>> {
 
 		@Override

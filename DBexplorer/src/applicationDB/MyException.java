@@ -1,4 +1,4 @@
-package application;
+package applicationDB;
 
 import javafx.scene.control.Alert.AlertType;
 

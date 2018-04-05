@@ -1,12 +1,12 @@
-package application;
+package applicationDB;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
 import view.View;
 
 /**
- * A simple database explorer, with modularity for multiples DBMS.
- * An excercise given on the 30/03/2018 at AFPA Arras by M. Azma.
+ * A simple database explorer, with modularity for multiples DBMS. An excercise
+ * given on the 30/03/2018 at AFPA Arras by M. Azma.
  * 
  * @author Cedric Ferrand
  * @version 1.0

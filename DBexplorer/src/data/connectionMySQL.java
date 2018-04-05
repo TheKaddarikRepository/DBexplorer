@@ -3,9 +3,7 @@ package data;
 import static data.interfaceMySQL.db;
 import static data.interfaceMySQL.driver;
 
-import application.MyException;
-import javafx.scene.control.Alert.AlertType;
-import view.View;
+import applicationDB.MyException;
 
 /**
  * Connection class specialized for MySQL.

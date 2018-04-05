@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import application.MyException;
+import applicationDB.MyException;
 import data.DataResults;
 import data.FileAction;
 import data.connectionDB;
@@ -24,6 +24,12 @@ import javafx.scene.control.TableColumn;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+/**
+ * this is the application controller.
+ * 
+ * @author cedric
+ *
+ */
 public class View {
 	private Parent root;
 	private ConneDbController control;
@@ -40,7 +46,7 @@ public class View {
 		this.primaryStage = _primaryStage;
 		try {
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("ConneDB.FXML"));
+			loader.setLocation(getClass().getResource("ConneDB.fxml"));
 			root = loader.load();
 			control = loader.getController();
 			primaryStage.setScene(new Scene(root));
@@ -94,6 +100,13 @@ public class View {
 	 * @throws MyException
 	 */
 	public void firstConnection(String address, String port) throws MyException {
+		if (dataBase != null)
+			try {
+				dataBase.stop();
+			} catch (SQLException e1) {
+				showError(new MyException(e1.getMessage(), AlertType.WARNING));
+			}
+
 		switch (control.getDataBaseCombo().getValue()) {
 		case MySQL:
 			LoginMessage myLogin = new LoginMessage();
@@ -102,14 +115,13 @@ public class View {
 					dataBase = new connectionMySQL(address, port, usernamePassword.getKey(),
 							usernamePassword.getValue());
 					dataBase.extractDataBases();
+					control.getDataBaseList().setItems(dataBase.getDataBases());
 				} catch (MyException e) {
 					showError(e);
 				} catch (SQLException e) {
 					showError(new MyException(e.getMessage(), AlertType.WARNING));
 				}
 			});
-			if (dataBase.getDataBases() != null)
-				control.getDataBaseList().setItems(dataBase.getDataBases());
 			break;
 		case PostgreSQL:
 			throw new MyException("This functionnality is not implemented yet!", AlertType.INFORMATION);

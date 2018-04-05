@@ -4,7 +4,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import application.MyException;
+import applicationDB.MyException;
 import data.databaseDrivers;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

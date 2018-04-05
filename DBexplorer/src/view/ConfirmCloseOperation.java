@@ -12,6 +12,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 
+/**
+ * 
+ * @author cedric ferrand
+ *
+ */
 public class ConfirmCloseOperation {
 	private Optional<Boolean> result;
 	private Dialog<Boolean> dialog;
@@ -24,14 +29,14 @@ public class ConfirmCloseOperation {
 		// Set the button types.
 		exitButtonType = new ButtonType("Exit", ButtonData.OK_DONE);
 		dialog.getDialogPane().getButtonTypes().addAll(exitButtonType, ButtonType.CANCEL);
-		// Create the username and password labels and fields.
+		// Create the label.
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(20, 150, 10, 10));
 		grid.add(new Label("Do you Want to Exit the application?"), 0, 0);
 		exitButton = dialog.getDialogPane().lookupButton(exitButtonType);
-		
+
 		dialog.getDialogPane().setContent(grid);
 		// Request focus on the exitButton field by default.
 		Platform.runLater(new TakeFocus());
@@ -41,6 +46,13 @@ public class ConfirmCloseOperation {
 		result = dialog.showAndWait();
 	}
 
+	/**
+	 * set focus on the exit button. untill the dialog is closed the primaryStage
+	 * thread is waiting.
+	 * 
+	 * @author cedric
+	 *
+	 */
 	class TakeFocus implements Runnable {
 
 		@Override
@@ -49,8 +61,16 @@ public class ConfirmCloseOperation {
 		}
 	}
 
+	/**
+	 * event handler to throw a boolean when a button is clicked to the principal
+	 * class. it will be called when used in View.
+	 * 
+	 * @author cedric ferrand
+	 *
+	 */
 	class OnAction implements Callback<ButtonType, Boolean> {
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public Boolean call(ButtonType param) {
 			if (param == exitButtonType) {
