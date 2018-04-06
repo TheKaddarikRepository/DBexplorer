@@ -223,13 +223,14 @@ public class View {
 				dataBase.executeAlter(query);
 				intoTable();
 				dataBase.extractDataBases();
+				String dbSel = control.getDataBaseList().getSelectionModel().getSelectedItem();
+				String tbsel = control.getTablesList().getSelectionModel().getSelectedItem();
 				control.getDataBaseList().setItems(dataBase.getDataBases());
-				if (control.getDataBaseList().getSelectionModel().getSelectedItem() != null) {
-					dataBase.extractTables(control.getDataBaseList().getSelectionModel().getSelectedItem());
+				if (dbSel != null) {
+					dataBase.extractTables(dbSel);
 					control.getTablesList().setItems(dataBase.getTables());
-					if (control.getTablesList().getSelectionModel().getSelectedItem() != null) {
-						dataBase.extractContent(control.getDataBaseList().getSelectionModel().getSelectedItem() + "."
-								+ control.getTablesList().getSelectionModel().getSelectedItem());
+					if (tbsel != null) {
+						dataBase.extractContent(dbSel + "." + tbsel);
 						intoTable();
 					}
 				}
