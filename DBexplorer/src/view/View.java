@@ -106,7 +106,7 @@ public class View {
 				control.getDataBaseList().getItems().clear();
 				control.getTablesList().getItems().clear();
 				control.getContentTable().getItems().clear();
-				dataBase=null;
+				dataBase = null;
 			} catch (SQLException e1) {
 				showError(new MyException(e1.getMessage(), AlertType.WARNING));
 			}
@@ -179,14 +179,17 @@ public class View {
 	private void intoTable() {
 		control.getContentTable().getColumns().removeAll(control.getContentTable().getColumns());
 		DataResults data = dataBase.getContent();
-
-		for (int i = 0; i < data.getNumColumns(); i++) {
-			TableColumn<List<Object>, Object> column = new TableColumn<>(data.getColumnName(i));
-			int columnIndex = i;
-			column.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().get(columnIndex)));
-			control.getContentTable().getColumns().add(column);
+		if (data != null) {
+			for (int i = 0; i < data.getNumColumns(); i++) {
+				TableColumn<List<Object>, Object> column = new TableColumn<>(data.getColumnName(i));
+				System.out.println("hell");
+				int columnIndex = i;
+				column.setCellValueFactory(
+						cellData -> new SimpleObjectProperty<>(cellData.getValue().get(columnIndex)));
+				control.getContentTable().getColumns().add(column);
+			}
+			control.getContentTable().getItems().setAll(data.getData());
 		}
-		control.getContentTable().getItems().setAll(data.getData());
 	}
 
 	/**
@@ -219,6 +222,18 @@ public class View {
 			try {
 				dataBase.executeAlter(query);
 				intoTable();
+				dataBase.extractDataBases();
+				control.getDataBaseList().setItems(dataBase.getDataBases());
+				if (control.getDataBaseList().getSelectionModel().getSelectedItem() != null) {
+					dataBase.extractTables(control.getDataBaseList().getSelectionModel().getSelectedItem());
+					control.getTablesList().setItems(dataBase.getTables());
+					if (control.getTablesList().getSelectionModel().getSelectedItem() != null) {
+						dataBase.extractContent(control.getDataBaseList().getSelectionModel().getSelectedItem() + "."
+								+ control.getTablesList().getSelectionModel().getSelectedItem());
+						intoTable();
+					}
+				}
+
 			} catch (SQLException e) {
 				showError(new MyException(e.getMessage(), AlertType.WARNING));
 			}
@@ -307,9 +322,9 @@ public class View {
 		}
 		return new String("");
 	}
-	
+
 	public void showDialogHelp() {
-			HelpDialog myHelp = new HelpDialog();
+		HelpDialog myHelp = new HelpDialog();
 	}
 
 }
