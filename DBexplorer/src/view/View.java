@@ -103,6 +103,9 @@ public class View {
 		if (dataBase != null)
 			try {
 				dataBase.stop();
+				control.getDataBaseList().getItems().clear();
+				control.getTablesList().getItems().clear();
+				control.getContentTable().getItems().clear();
 			} catch (SQLException e1) {
 				showError(new MyException(e1.getMessage(), AlertType.WARNING));
 			}
@@ -125,9 +128,11 @@ public class View {
 			break;
 		case PostgreSQL:
 			throw new MyException("This functionnality is not implemented yet!", AlertType.INFORMATION);
-		case OracleDatabase:
+		case Oracle:
 			throw new MyException("This functionnality is not implemented yet!", AlertType.INFORMATION);
-		case Db2:
+		case Derby:
+			throw new MyException("This functionnality is not implemented yet!", AlertType.INFORMATION);
+		case MSSQL:
 			throw new MyException("This functionnality is not implemented yet!", AlertType.INFORMATION);
 		default:
 		}
@@ -300,6 +305,10 @@ public class View {
 			}
 		}
 		return new String("");
+	}
+	
+	public void showDialogHelp() {
+			HelpDialog myHelp = new HelpDialog();
 	}
 
 }

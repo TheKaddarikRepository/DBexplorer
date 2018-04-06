@@ -66,6 +66,11 @@ public class ConneDbController {
 
 	@FXML
 	private Button connectButton;
+	
+	@FXML
+    void showHelp(ActionEvent event) {
+		myView.showDialogHelp();
+    }
 
 	@FXML
 	void connectDB(ActionEvent event) {

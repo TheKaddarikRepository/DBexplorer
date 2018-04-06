@@ -6,5 +6,5 @@ package data;
  *
  */
 public enum databaseDrivers {
-MySQL,PostgreSQL,OracleDatabase,Db2;
+MySQL,Oracle,MSSQL,Derby,PostgreSQL;
 }
