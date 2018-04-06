@@ -106,6 +106,7 @@ public class View {
 				control.getDataBaseList().getItems().clear();
 				control.getTablesList().getItems().clear();
 				control.getContentTable().getItems().clear();
+				dataBase=null;
 			} catch (SQLException e1) {
 				showError(new MyException(e1.getMessage(), AlertType.WARNING));
 			}

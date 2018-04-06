@@ -102,8 +102,10 @@ public abstract class connectionDB {
 	 * @throws SQLException
 	 */
 	public void stop() throws SQLException {
-		if (connection != null)
+		if (connection != null) {
 			connection.close();
+			connection = null;
+		}
 	}
 
 	/**
