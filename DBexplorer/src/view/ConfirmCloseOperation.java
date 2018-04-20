@@ -13,9 +13,9 @@ import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 
 /**
- * Une modif pour faire fonctionner github.
+ * 
  * @author cedric ferrand
- *
+ * @date 2018/04/20
  */
 public class ConfirmCloseOperation {
 	private Optional<Boolean> result;
