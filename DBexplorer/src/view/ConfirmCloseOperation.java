@@ -13,7 +13,7 @@ import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 
 /**
- * 
+ * Une modif pour faire fonctionner github.
  * @author cedric ferrand
  *
  */
